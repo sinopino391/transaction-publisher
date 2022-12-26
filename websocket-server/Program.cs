@@ -1,18 +1,42 @@
-﻿using System.Net.Sockets;
-using System.Net;
-using System;
 
-class Server
+namespace websocket_server;
+
+public class Program
 {
-    public static void Main()
+    public static void Main(string[] args)
     {
-        TcpListener server = new TcpListener(IPAddress.Parse("0.0.0.0"), 5000);
+        var builder = WebApplication.CreateBuilder(args);
 
-        server.Start();
-        Console.WriteLine("Server has started on 0.0.0.0:5000.{0}Waiting for a connection…", Environment.NewLine);
+        // Add services to the container.
 
-        TcpClient client = server.AcceptTcpClient();
+        builder.Services.AddControllers();
+        builder.Services.AddCors();
 
-        Console.WriteLine("A client connected.");
+        var app = builder.Build();
+
+        var webSocketOptions = new WebSocketOptions
+        {
+            KeepAliveInterval = TimeSpan.FromMinutes(2)
+        };
+
+        webSocketOptions.AllowedOrigins.Add("https://sinopino391-probable-guide-qrp9pr6qwvw2xvgg-3000.preview.app.github.dev/");
+
+        app.UseWebSockets(webSocketOptions);
+
+        // global cors policy
+        app.UseCors(x => x
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .SetIsOriginAllowed(origin => true) // allow any origin
+                                                //.WithOrigins("https://localhost:44351")); // Allow only this origin can also have multiple origins separated with comma
+            .AllowCredentials()); // allow credentials
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthorization();
+
+        app.MapControllers();
+
+        app.Run();
     }
 }

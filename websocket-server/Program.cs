@@ -19,8 +19,6 @@ public class Program
             KeepAliveInterval = TimeSpan.FromMinutes(2)
         };
 
-        webSocketOptions.AllowedOrigins.Add("https://sinopino391-probable-guide-qrp9pr6qwvw2xvgg-3000.preview.app.github.dev/");
-
         app.UseWebSockets(webSocketOptions);
 
         // global cors policy

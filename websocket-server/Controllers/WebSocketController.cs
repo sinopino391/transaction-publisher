@@ -1,4 +1,5 @@
 using System.Net.WebSockets;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 
 public class WebSocketController : ControllerBase
@@ -10,13 +11,44 @@ public class WebSocketController : ControllerBase
         if (HttpContext.WebSockets.IsWebSocketRequest)
         {
             using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-            await Echo(webSocket);
+            try
+            {
+                await Echo(webSocket);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error!");
+            }
         }
         else
         {
             HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         }
     }
+
+    [Route("/transaction")]
+    public async Task GetData()
+    {
+        Console.WriteLine("transaction connected!");
+        if (HttpContext.WebSockets.IsWebSocketRequest)
+        {
+            using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+            try
+            {
+                Console.WriteLine("try block");
+                await webSocket.SendAsync(Encoding.UTF8.GetBytes($"Hallo server hier"), WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error!");
+            }
+        }
+        else
+        {
+            HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
+    }
+
 
     private static async Task Echo(WebSocket webSocket)
     {

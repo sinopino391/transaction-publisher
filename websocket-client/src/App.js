@@ -6,7 +6,7 @@ function App() {
 
   useEffect(() => {
     // Connect to the WebSocket server
-    const ws = new WebSocket('ws://0.0.0.0:5000');
+    const ws = new WebSocket('wss://sinopino391-probable-guide-qrp9pr6qwvw2xvgg-5272.preview.app.github.dev/ws');
 
     // Add event listeners
     ws.onopen = () => {
@@ -27,8 +27,10 @@ function App() {
 
     // Clean up the WebSocket connection when the component unmounts
     return () => {
-      ws.close();
-    };
+      if (ws.readyState === 1) {
+        ws.close();
+      };
+    }
   }, []);
 
   return (
